@@ -1,0 +1,31 @@
+service: app
+
+provider:
+    name: aws
+    region: eu-central-1
+    runtime: provided
+
+    memoryLimit: 256
+
+    stage: dev
+
+    environment:
+        BOT_TOKEN: ${ssm:/app/bot-token}
+
+
+
+plugins:
+    - ./vendor/bref/bref
+
+functions:
+    api:
+        handler: public/index.php
+        description: ''
+        timeout: 28 # in seconds (API Gateway has a timeout of 29 seconds)
+        layers:
+            - ${bref:layer.php-73-fpm}
+        events:
+            -   http: 'ANY /'
+            -   http: 'ANY /{proxy+}'
+        environment:
+            MY_VARIABLE: ${ssm:/app/my_variable}
